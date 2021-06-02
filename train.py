@@ -4,6 +4,7 @@ import os
 import torch.nn as nn
 import numpy as np
 from transtensor import *
+from dictionary import *
 '''
 训练分为八步：
 1) 把整个batch的输入传入encoder 

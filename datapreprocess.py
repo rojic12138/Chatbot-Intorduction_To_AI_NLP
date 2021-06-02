@@ -51,12 +51,12 @@ def IsVocWordInPair(voc, pair):
     return True
 
 # sentence简化并分词
-def NormalizeSentence(sentence):
+def NormalizeSentence(sentence, is_input = False):
     sentence.encode('utf-8')
-    #如果需要分词，使用结巴分词
-    if need_jieba:
+    # 如果需要分词，使用结巴分词
+    if need_jieba or is_input:
         sentence = jieba.lcut(regex.sub("", sentence))
-    #已经分好词了，直接split
+    # 已经分好词了，直接split
     else:
         sentence = sentence.split(' ')
 

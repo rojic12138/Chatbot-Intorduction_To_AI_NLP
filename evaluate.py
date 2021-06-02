@@ -1,7 +1,10 @@
 #Written by LH 
+from datapreprocess import *
 import torch
 import os
 import torch.nn as nn
+from transtensor import *
+from dictionary import *
 '''
 贪心解码算法 :
     每次选择概率最高的词，作为下一个时刻的输入，直到遇到EOS或者达到最大长度
@@ -62,7 +65,7 @@ class GreedySearchDecoder(nn.Module):
 '''
 def evaluate(encoder, decoder, searcher, voc, sentence, max_length=MAX_LENGTH):
     #句子->ID
-    indexes_batch=[indexesFromSentence(voc,sentence)]
+    indexes_batch=[IndexesFromSentence(voc,sentence)]
     lengths=torch.tensor([len(indexes)for indexes in indexes_batch])
     #转置 
     input_batch = torch.LongTensor(indexes_batch).transpose(0, 1)
@@ -89,12 +92,12 @@ def evaluateInput(encoder, decoder, searcher, voc):
     input_sentence = ''
     while(1):
         try:
-            s
+            
             input_sentence = input('请输入> ')
             #输入q/quit，结束程序
             if input_sentence == 'q' or input_sentence == 'quit': break
             #句子归一化
-            input_sentence = normalizeString(input_sentence)
+            input_sentence = NormalizeSentence(input_sentence, True)
             #生成答句
             output_words = evaluate(encoder, decoder, searcher, voc, input_sentence)
             #去掉EOS后面的内容

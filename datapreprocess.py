@@ -13,7 +13,9 @@ from transtensor import *
 
 """
 数据的预处理
-直接调用DataPreprocess，具体流程见main
+调用Datapreprocess，获取pairs和voc
+使用pairs可以创建batch，通过Batch2Tensor可以获取向量
+和官方示例的功能一样
 """
 
 # 句子是否已分词
@@ -29,12 +31,12 @@ jieba.setLogLevel(logging.INFO)
 regex = re.compile("[^\u4e00-\u9fa5a-zA-Z0-9]")
 
 
-# filter the pair whose length is more than 50
+# 满足句子长度不超过50返回true
 def filterPair(pair):
     return len(pair[0]) <= MAX_SENTENCE_LEN and len(pair[1]) <= MAX_SENTENCE_LEN
 
 
-# add the words in pair to voc
+# 将pair中的词加入词典
 def AddWord2Voc(voc, pair):
     for sentence in pair:
         for word in sentence:
@@ -76,7 +78,7 @@ def LoadVoc(voc, load_path):
             word_dict[line[0]] = int(line[1])
     voc.InitializeVoc(word_dict)
 
-
+# 数据预处理
 def DataPreprocess(file_name, voc_file = ""):
     print("\nData preprocessing ... ")
     voc = Vocabulary("zh-voc")
@@ -112,7 +114,6 @@ def DataPreprocess(file_name, voc_file = ""):
 
 
 # 保存转化好的句子对，句子对用\t分隔
-# 输出词典内容
 def OutputFile(pairs, file_name):
     with open(file_name, 'w', encoding='utf-8') as f:
         for pair in pairs:
@@ -124,12 +125,15 @@ def OutputFile(pairs, file_name):
 
 # 测试batch转换
 def TestBatchTrans(pairs, file_name):
+    # batch size 设置为5，随机选出一个batch
     test_batch_size = 5
     test_batch = [random.choice(pairs) for i in range(test_batch_size)]
-
+    
+    # 大概是核心功能
     batches = Batch2Tensor(test_batch, voc)
     input_tensor, output_tensor, lengths, max_output_len, mask= batches
-
+    
+    # 看看效果
     with open(file_name, 'w', encoding='utf-8') as f:
         f.write("input_tensor:{}".format(input_tensor))
         f.write('\n')

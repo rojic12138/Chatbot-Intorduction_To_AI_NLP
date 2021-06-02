@@ -3,6 +3,7 @@ import torch
 import os
 import torch.nn as nn
 import numpy as np
+from transtensor import *
 '''
 训练分为八步：
 1) 把整个batch的输入传入encoder 
@@ -88,7 +89,7 @@ def trainIters(model_name,voc ,pairs,encoder,decoder,encoder_optimizer,decoder_o
                encoder_n_layers,decoder_n_layers,save_dir,n_iteration,batch_size,print_every,
                save_every,clip,corpus_name,loadFilename):
     #随机选择n_iteration个batch的数据(pair)
-    training_batches=[batch2TrainData(voc,[random.choice(pairs) for _ in range(batch_size)]) for _ in range(n_iteration)]
+    training_batches=[Batch2Tensor([random.choice(pairs) for _ in range(batch_size)], voc) for _ in range(n_iteration)]
     #初始化
     print('初始化中...')
     start_iteration=1

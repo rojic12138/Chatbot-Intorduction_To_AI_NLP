@@ -15,10 +15,10 @@ def Chat():
     # 调整为eval模式
     encoder.eval()
     decoder.eval()
-    searcher = GreedySearchDecoder(encoder, decoder)
+    searcher = GreedySearchDecoder(encoder, decoder, opt.device)
     
     # 处理输入
-    evaluateInput(encoder, decoder, searcher, voc)
+    evaluateInput(opt, encoder, decoder, searcher, voc)
 
 
 if __name__ == '__main__':

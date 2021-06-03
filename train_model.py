@@ -57,13 +57,13 @@ def Train():
     decoder.eval()
 
     # 初始化搜索解码器
-    searcher = GreedySearchDecoder(encoder, decoder)
+    searcher = GreedySearchDecoder(encoder, decoder, opt.device)
 
     # 结巴分词准备
     init = "".join(list(jieba.cut("Initialize chatting...")))
 
     # 开始聊天
-    evaluateInput(encoder, decoder, searcher, voc)
+    evaluateInput(opt, encoder, decoder, searcher, voc)
 
 if __name__ == '__main__':
     Train()

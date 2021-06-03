@@ -1,4 +1,5 @@
 #Written by LH 
+from torch._C import device
 from datapreprocess import *
 import torch
 import os
@@ -24,19 +25,22 @@ from dictionary import *
 '''
 
 class GreedySearchDecoder(nn.Module):
-    def __init__(self,encoder,decoder):
+    def __init__(self, encoder, decoder, device):
         super(GreedySearchDecoder,self).__init__()
         self.encoder=encoder
         self.decoder=decoder
-    def forward(self,input_seq,input_length,max_length):
+        self.device=device
+
+    def forward(self,input_seq, input_length, max_length):
+        device = self.device
         #encoder的forward计算 
         encoder_outputs, encoder_hidden = self.encoder(input_seq, input_length)
         #将encoder最后时刻的隐状态作为docoder的初始值
-        decoder_hidden=encoder_hidden[:decoder.n_layers]
+        decoder_hidden=encoder_hidden[:self.decoder.n_layers]
         #Decoder的初始输入是SOS
-        decoder_input=torch.ones(1,1,device=device,dtype=torch.long)*SOS_token
+        decoder_input=torch.ones(1,1,device=device,dtype=torch.long)*SOS_index
         #保存解码结果
-        all_tokens=torch.zeros([0],device=device,dtype=toch.long)
+        all_tokens=torch.zeros([0],device=device,dtype=torch.long)
         all_scores=torch.zeros([0],device=device)
         
         for _ in range(max_length):
@@ -46,6 +50,8 @@ class GreedySearchDecoder(nn.Module):
             # decoder_outputs是(batch=1, vob_size)
             #使用max返回概率最大的词和得分
             decoder_scores, decoder_input = torch.max(decoder_output, dim=1)
+            if decoder_input == EOS_index:
+                break
             # 把解码结果保存到all_tokens和all_scores里
             all_tokens = torch.cat((all_tokens, decoder_input), dim=0)
             all_scores = torch.cat((all_scores, decoder_scores), dim=0)
@@ -63,7 +69,9 @@ class GreedySearchDecoder(nn.Module):
 2)传入解码器得到ID 
 3)转换成词
 '''
-def evaluate(encoder, decoder, searcher, voc, sentence, max_length=MAX_SENTENCE_LEN):
+def evaluate(opt, encoder, decoder, searcher, voc, sentence, max_length=MAX_SENTENCE_LEN):
+    
+    device = opt.device
     #句子->ID
     indexes_batch=[IndexesFromSentence(voc,sentence)]
     lengths=torch.tensor([len(indexes)for indexes in indexes_batch])
@@ -88,7 +96,7 @@ evaluateInput是chatbot的用户接口
 4)重复对话，直到输入q/quit
 '''
     
-def evaluateInput(encoder, decoder, searcher, voc):
+def evaluateInput(opt, encoder, decoder, searcher, voc):
     input_sentence = ''
     while(1):
         try:
@@ -98,7 +106,7 @@ def evaluateInput(encoder, decoder, searcher, voc):
             #句子归一化
             input_sentence = NormalizeSentence(input_sentence, True)
             #生成答句
-            output_words = evaluate(encoder, decoder, searcher, voc, input_sentence)
+            output_words = evaluate(opt, encoder, decoder, searcher, voc, input_sentence)
             #去掉EOS后面的内容
             words = []
             for word in output_words:
@@ -106,7 +114,7 @@ def evaluateInput(encoder, decoder, searcher, voc):
                     break
                 elif word != 'PAD':
                     words.append(word)
-            print('尬聊Bot:', ' '.join(words))
+            print('尬聊Bot:', ''.join(words))
         #错误处理
         except KeyError:
             print("Error: Encountered unknown word.")

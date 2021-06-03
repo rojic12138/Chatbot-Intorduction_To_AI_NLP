@@ -39,8 +39,10 @@ def initGenModel(opt):
 
     # 初始化模型
     print('Initilize model')
-    encoder = EncoderRNN(opt.hidden_size, embedding, opt.encoder_n_layers, opt.dropout)
-    decoder = LuongAttnDecoderRNN(opt.attn_method, embedding, opt.hidden_size, voc.words_num, opt.decoder_n_layers, opt.dropout)
+    #encoder = EncoderRNN(opt.hidden_size, embedding, opt.encoder_n_layers, opt.dropout)
+    encoder = EncoderTransformer(opt.hidden_size, embedding, opt.encoder_n_layers, opt.dropout)
+    #decoder = LuongAttnDecoderRNN(opt.attn_method, embedding, opt.hidden_size, voc.words_num, opt.decoder_n_layers, opt.dropout)
+    decoder = DecoderTransformer(embedding, opt.hidden_size, voc.words_num, opt.device, opt.decoder_n_layers, opt.dropout, heads = 4)
     if opt.load_file:
         encoder.load_state_dict(encoder_sd)
         decoder.load_state_dict(decoder_sd)

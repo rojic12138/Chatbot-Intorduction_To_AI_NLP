@@ -36,17 +36,18 @@ class GreedySearchDecoder(nn.Module):
         #encoder的forward计算 
         encoder_outputs, encoder_hidden = self.encoder(input_seq, input_length)
         #将encoder最后时刻的隐状态作为docoder的初始值
-        decoder_hidden=encoder_hidden[:self.decoder.n_layers]
+        decoder_hidden=encoder_hidden[:self.decoder.n_layers] if encoder_hidden is not None else None
         #Decoder的初始输入是SOS
         decoder_input=torch.ones(1,1,device=device,dtype=torch.long)*SOS_index
         #保存解码结果
         all_tokens=torch.zeros([0],device=device,dtype=torch.long)
         all_scores=torch.zeros([0],device=device)
-        
+        output = torch.zeros((max_length + 1, 1)).long().to(device)
+        output[0] = decoder_input
         for _ in range(max_length):
             #decoder forward一步
-            decoder_output, decoder_hidden = self.decoder(decoder_input, decoder_hidden, 
-								encoder_outputs)
+            decoder_output, decoder_hidden = self.decoder(output, decoder_hidden, 
+								encoder_outputs,_)
             # decoder_outputs是(batch=1, vob_size)
             #使用max返回概率最大的词和得分
             decoder_scores, decoder_input = torch.max(decoder_output, dim=1)
@@ -58,6 +59,7 @@ class GreedySearchDecoder(nn.Module):
             # decoder_input是当前时刻输出的词的ID，这是个一维的向量，因为max会减少一维。
             # 但是decoder要求有一个batch维度，因此用unsqueeze增加batch维度。
             decoder_input = torch.unsqueeze(decoder_input, 0)
+            output[_+1] = decoder_input
         # 返回所有的词和得分。
         return all_tokens, all_scores
     

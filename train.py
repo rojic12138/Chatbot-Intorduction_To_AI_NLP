@@ -55,18 +55,21 @@ def train(opt,
     #decoder的初始输入是SOS，需要构造(1,batch)的输入，表示第一个时刻的batch个输入
     decoder_input=torch.LongTensor([[SOS_index for _ in range(batch_size)]])
     decoder_input=decoder_input.to(device)
-    decoder_hidden=encoder_hidden[:decoder.n_layers]
+    decoder_hidden=encoder_hidden[:decoder.n_layers] if encoder_hidden is not None else None
     
     #确定是否采用teacher forcing
     use_teacher_forcing=True if random.random() < teacher_forcing_ratio else False
     
     
     #一次处理一个时刻
+    output = torch.zeros((max_target_len + 1, batch_size)).long().to(device)
+    output[0,:] = decoder_input
     if use_teacher_forcing:
         for t in range(max_target_len):
-            decoder_output,decoder_hidden=decoder(decoder_input,decoder_hidden,encoder_outputs)
+            decoder_output,decoder_hidden=decoder(output,decoder_hidden,encoder_outputs,t)
             #下一个时刻的输入是当前正确答案
             decoder_input=target_variable[t].view(1,-1)
+            output[t+1,:] = decoder_input
             #累计loss
             mask_loss,nTotal = maskNLLLoss(opt, decoder_output,target_variable[t],mask[t])
             loss+=mask_loss
@@ -74,11 +77,12 @@ def train(opt,
             n_totals+=nTotal
     else:
         for t in range(max_target_len):
-            decoder_output,decoder_hidden = decoder(decoder_input,decoder_hidden,encoder_outputs)
+            decoder_output,decoder_hidden = decoder(output,decoder_hidden,encoder_outputs,t)
             #下一个时刻的输入是当前模型预测概率最高的值
             _,topi=decoder_output.topk(1)
             decoder_input=torch.LongTensor([[topi[i][0] for i in range(batch_size)]])
             decoder_input=decoder_input.to(device)
+            output[t+1,:] = decoder_input
             #累计loss
             mask_loss,nTotal = maskNLLLoss(opt, decoder_output,target_variable[t],mask[t])
             loss += mask_loss

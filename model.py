@@ -3,7 +3,7 @@ from torch.jit import script, trace
 import torch.nn as nn
 from torch import optim
 import torch.nn.functional as F
-
+from model2 import *
 class EncoderRNN(nn.Module):
     def __init__(self, hidden_size, embedding, n_layers=1, dropout=0):
         super(EncoderRNN, self).__init__()
@@ -24,11 +24,13 @@ class EncoderRNN(nn.Module):
         packed = torch.nn.utils.rnn.pack_padded_sequence(embedded, input_lengths.cpu())
         # Forward pass through GRU
         outputs, hidden = self.gru(packed, hidden)
+        #print(hidden.shape, embedded.shape, input_seq.shape)
         # Unpack padding
         outputs, _ = torch.nn.utils.rnn.pad_packed_sequence(outputs)
+        #print(outputs[-1,:,0])
         # Sum bidirectional GRU outputs
         outputs = outputs[:, :, :self.hidden_size] + outputs[:, :, self.hidden_size:]
-
+        #print(outputs.shape)
         # outputs：GRU最后一个隐藏层的输出特征(双向输出之和）; shape = (max_length，batch_size，hidden_size）
         # hidden：从GRU更新隐藏状态; shape =(n_layers x num_directions，batch_size，hidden_size）
         return outputs, hidden
@@ -103,10 +105,13 @@ class LuongAttnDecoderRNN(nn.Module):
 
         self.attn = Attn(attn_model, hidden_size)
 
-    def forward(self, input_step, last_hidden, encoder_outputs):
+    def forward(self, input_step_, last_hidden, encoder_outputs, position):
         # 注意：decoder每一步只能处理一个时刻的数据，因为t时刻计算完了才能计算t+1时刻。
         # input_step的shape是(1, 64)，64是batch，1是当前输入的词ID(来自上一个时刻的输出)
         # 通过embedding层变成(1, 64, 500)，然后进行dropout，shape不变。
+        #print(input_step_.shape)
+        input_step = input_step_.clone().detach()[position].reshape(1,-1)
+        #print(input_step.shape)
         embedded = self.embedding(input_step)
         embedded = self.embedding_dropout(embedded)
         # 把embedded传入GRU进行forward计算
@@ -132,7 +137,7 @@ class LuongAttnDecoderRNN(nn.Module):
         # self.concat(concat_input)的输出是(64, 500)
         # 然后用tanh把输出返回变成(-1,1)，concat_output的shape是(64, 500)
         concat_output = torch.tanh(self.concat(concat_input))
-        # out是(64, 词典大小voc.num_words)
+        # out是(batch_size, 词典大小voc.num_words)
         output = self.out(concat_output)
         output = F.softmax(output, dim=1)
         # Return output and final hidden state

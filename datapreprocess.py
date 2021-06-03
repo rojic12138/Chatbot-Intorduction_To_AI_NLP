@@ -83,8 +83,8 @@ def DataPreprocess(file_name, voc_file = ""):
     print("\nData preprocessing ... ")
     voc = Vocabulary("zh-voc")
     # 如果需要，加载词典
-    if load_voc:
-        LoadVoc(voc, voc_file)
+    # if load_voc:
+    #     LoadVoc(voc, voc_file)
 
     clean_pairs = []
     with open(file_name, 'r', encoding='utf-8') as f:
@@ -104,12 +104,13 @@ def DataPreprocess(file_name, voc_file = ""):
                 AddWord2Voc(voc, clean_pair)
                 clean_pairs.append(clean_pair)
 
-    voc.Trim(10)  # abandon the words with count less than 10
+    # abandon the words with count less than 5
+    voc.Trim(5)  
     # 如果pair中的词不再词典里直接过滤
     filtered_pairs = [pair for pair in clean_pairs if IsVocWordInPair(voc, pair)]
     # 存储 voc
-    if save_voc:
-        SaveVoc(voc, voc_file)
+    # if save_voc:
+    #     SaveVoc(voc, voc_file)
     return voc, filtered_pairs
 
 
@@ -124,7 +125,7 @@ def OutputFile(pairs, file_name):
 
 
 # 测试batch转换
-def TestBatchTrans(pairs, file_name):
+def TestBatchTrans(pairs, file_name = ''):
     # batch size 设置为5，随机选出一个batch
     test_batch_size = 5
     test_batch = [random.choice(pairs) for i in range(test_batch_size)]
@@ -134,35 +135,46 @@ def TestBatchTrans(pairs, file_name):
     input_tensor, output_tensor, lengths, max_output_len, mask= batches
     
     # 看看效果
-    with open(file_name, 'w', encoding='utf-8') as f:
-        f.write("input_tensor:{}".format(input_tensor))
-        f.write('\n')
-        f.write("length:{}".format(lengths))
-        f.write('\n')
-        f.write("output_tensor:{}".format(output_tensor))
-        f.write('\n')
-        f.write("mask:{}".format(mask))
-        f.write('\n')
-        f.write("max_outpus_len:{}".format(max_output_len))
+    # with open(file_name, 'w', encoding='utf-8') as f:
+    #     f.write("input_tensor:{}".format(input_tensor))
+    #     f.write('\n')
+    #     f.write("length:{}".format(lengths))
+    #     f.write('\n')
+    #     f.write("output_tensor:{}".format(output_tensor))
+    #     f.write('\n')
+    #     f.write("mask:{}".format(mask))
+    #     f.write('\n')
+    #     f.write("max_outpus_len:{}".format(max_output_len))
 
 
 if __name__ == "__main__":
     raw_name = 'qingyun_processed'
     raw_file_name = 'raw_data/' + raw_name + '.txt'
-    processed_file_name = 'raw_data/' + raw_name + '_p.txt'
-    voc_file_name = 'raw_data/' + raw_name + '_voc.txt'
-    batch_file_name = 'raw_data/' + raw_name + '_batch.txt'
+
+    # processed_file_name = 'raw_data/' + raw_name + '_p.txt'
+    # voc_file_name = 'raw_data/' + raw_name + '_voc.txt'
+    # batch_file_name = 'raw_data/' + raw_name + '_batch.txt'
     
     # 数据预处理
-    voc, pairs = DataPreprocess(raw_file_name, voc_file_name)
+    voc, pairs = DataPreprocess(raw_file_name)
 
     whitespace = ' '
     print("\nThe dictionary has {} words.".format(voc.words_num))
-    print("\n{} pairs selected.".format(len(pairs)))
+    print("\n{} pairs selected.".format(len(pairs)))    
     
+    # 保存voc和pairs
+    with open('data/voc.pkl','wb') as f:
+        pickle.dump(voc, f)
+    print('voc saved')
+
+    with open('data/pairs.pkl','wb') as f:
+        pickle.dump(pairs, f)
+    print('pairs saved')
+
+ 
     # 输出pairs
     # OutputFile(pairs, processed_file_name)
 
-    #测试batch转换
-    TestBatchTrans(pairs, batch_file_name)
+    # 测试batch转换
+    TestBatchTrans(pairs)
 

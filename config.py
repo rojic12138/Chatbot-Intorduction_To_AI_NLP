@@ -5,9 +5,10 @@ class Config:
     '''
     Chatbot模型参数
     '''
-    processed_data_path = 'corpus.pth'            #已处理的对话数据
-    voc_file = None
-    pairs_file = None
+    corpus_name = 'qingyun'
+    corpus_path = 'corpus.pth'            #已处理的对话数据
+    voc_file = 'data/voc.pkl'
+    pairs_file = 'data/pairs.pkl'
     load_file = None
     embedding_file = None
     max_input_length = 50                         #输入的最大句子长度
@@ -18,7 +19,7 @@ class Config:
     '''
     训练超参数
     '''
-    batch_size = 2048
+    batch_size = 10
     shuffle = True                                #dataloader是否打乱数据
     num_workers = 0                               #dataloader多进程提取数据
     bidirectional = True                          #Encoder-RNN是否双向
@@ -35,9 +36,9 @@ class Config:
     '''
     训练周期信息
     '''
-    n_iteration = 6000
+    n_iteration = 10
     print_every = 1
-    save_every = 50
+    save_every = 10
     '''
     GPU
     '''

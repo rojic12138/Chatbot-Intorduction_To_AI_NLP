@@ -26,7 +26,7 @@ def initGenModel(opt):
     
     # 初始化词向量
     print('Initialize word embeddings')
-    embedding = nn.Embedding(voc.num_words, opt.hidden_size)
+    embedding = nn.Embedding(voc.words_num, opt.hidden_size)
 
     # 载入预训练的词向量
     if opt.load_file:
@@ -40,8 +40,7 @@ def initGenModel(opt):
     # 初始化模型
     print('Initilize model')
     encoder = EncoderRNN(opt.hidden_size, embedding, opt.encoder_n_layers, opt.dropout)
-    attn_model = Attn(opt.method, opt.hidden_size)
-    decoder = LuongAttnDecoderRNN(attn_model, embedding, opt.hidden_size, voc.num_words, opt.decoder_n_layers, opt.dropout)
+    decoder = LuongAttnDecoderRNN(opt.attn_method, embedding, opt.hidden_size, voc.words_num, opt.decoder_n_layers, opt.dropout)
     if opt.load_file:
         encoder.load_state_dict(encoder_sd)
         decoder.load_state_dict(decoder_sd)

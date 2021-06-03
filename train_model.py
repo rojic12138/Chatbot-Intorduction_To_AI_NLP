@@ -1,6 +1,6 @@
 from train import trainIters
 from config import Config
-from evaluate import GreedySearchDecoder, evaluateInput
+from evaluate import *
 import os
 import jieba
 from load_model import *
@@ -47,9 +47,9 @@ def Train():
     print("Trainging")
     save_dir = os.path.join("data", "save")
 
-    trainIters(opt.model_name, voc, pairs, encoder, decoder, encoder_optimizer, decoder_optimizer,
-               embedding, opt.encoder_n_layers, opt.decoder_n_layers, save_dir, opt.n_iteration, opt.batch_size,
-               opt.print_every, opt.save_every, opt.clip, opt.processed_data_path, opt.load_file)
+    trainIters(opt, 
+               voc, pairs, encoder, decoder, encoder_optimizer, decoder_optimizer,embedding, 
+               save_dir)
 
     print("Evaluation Mode")
     # 设置为eval model
@@ -63,7 +63,7 @@ def Train():
     init = "".join(list(jieba.cut("Initialize chatting...")))
 
     # 开始聊天
-    evaluateInput(searcher, voc)
+    evaluateInput(encoder, decoder, searcher, voc)
 
 if __name__ == '__main__':
     Train()

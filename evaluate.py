@@ -63,7 +63,7 @@ class GreedySearchDecoder(nn.Module):
 2)传入解码器得到ID 
 3)转换成词
 '''
-def evaluate(encoder, decoder, searcher, voc, sentence, max_length=MAX_LENGTH):
+def evaluate(encoder, decoder, searcher, voc, sentence, max_length=MAX_SENTENCE_LEN):
     #句子->ID
     indexes_batch=[IndexesFromSentence(voc,sentence)]
     lengths=torch.tensor([len(indexes)for indexes in indexes_batch])
@@ -79,20 +79,19 @@ def evaluate(encoder, decoder, searcher, voc, sentence, max_length=MAX_LENGTH):
     return decoded_words
 
 
- '''
- evaluateInput是chatbot的用户接口
- 过程：
- 1)输入一个句子
- 2)用evaluate生成回 去
- 3)掉EOS之后的内容
- 4)重复对话，直到输入q/quit
- '''
+'''
+evaluateInput是chatbot的用户接口
+过程：
+1)输入一个句子
+2)用evaluate生成回 去
+3)掉EOS之后的内容
+4)重复对话，直到输入q/quit
+'''
     
 def evaluateInput(encoder, decoder, searcher, voc):
     input_sentence = ''
     while(1):
         try:
-            
             input_sentence = input('请输入> ')
             #输入q/quit，结束程序
             if input_sentence == 'q' or input_sentence == 'quit': break

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import torch
 import os
+import random
 import torch.nn as nn
 import numpy as np
 from config import Config
@@ -17,6 +18,9 @@ def initGenModel(opt):
     # 加载pairs
     with open(opt.pairs_file, 'rb') as f:
         pairs = pickle.load(f)
+
+    if opt.shuffle:
+        random.shuffle(pairs)
 
     # 如果有load file 进行加载
     if opt.load_file:

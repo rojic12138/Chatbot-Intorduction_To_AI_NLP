@@ -19,8 +19,7 @@ class Config:
     训练超参数
     '''
     batch_size = 20
-    shuffle = True                                #dataloader是否打乱数据
-    num_workers = 0                               #dataloader多进程提取数据
+    shuffle = True                                #是否打乱数据
     bidirectional = True                          #Encoder-RNN是否双向
     hidden_size = 240
     embedding_dim = 256

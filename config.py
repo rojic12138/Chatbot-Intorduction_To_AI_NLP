@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import torch
 
 class Config:
@@ -34,7 +36,7 @@ class Config:
     训练周期信息
     '''
     n_iteration = 1000                            # 训练次数
-    print_every = 1
+    print_every = 10
     save_every = 500                              # 存储训练的数据
     '''
     GPU

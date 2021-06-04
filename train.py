@@ -1,4 +1,5 @@
-#Written by LH 
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import random
 import torch
 import os

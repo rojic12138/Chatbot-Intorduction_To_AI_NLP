@@ -1,5 +1,7 @@
 import torch
 from torch.jit import script, trace
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import torch.nn as nn
 from torch import optim
 import torch.nn.functional as F

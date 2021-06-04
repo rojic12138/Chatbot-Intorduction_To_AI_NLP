@@ -1,3 +1,5 @@
+#!/usr/bin/python3.9 
+# -*- coding: utf-8 -*- 
 from train import trainIters
 from config import Config
 from evaluate import *

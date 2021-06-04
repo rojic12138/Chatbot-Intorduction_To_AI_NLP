@@ -1,4 +1,5 @@
-#Written by LH 
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from torch._C import device
 from datapreprocess import *
 import torch

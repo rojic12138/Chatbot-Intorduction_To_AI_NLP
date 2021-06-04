@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import torch
 import torch.nn as nn
 import math
@@ -168,36 +170,36 @@ class LuongAttnDecoderRNN(nn.Module):
         self.attn = Attn(attn_model, hidden_size)
 
     def forward(self, input_step, last_hidden, encoder_outputs):
-        # ×¢Òâ£ºdecoderÃ¿Ò»²½Ö»ÄÜ´¦ÀíÒ»¸öÊ±¿ÌµÄÊý¾Ý£¬ÒòÎªtÊ±¿Ì¼ÆËãÍêÁË²ÅÄÜ¼ÆËãt+1Ê±¿Ì¡£
-        # input_stepµÄshapeÊÇ(1, 64)£¬64ÊÇbatch£¬1ÊÇµ±Ç°ÊäÈëµÄ´ÊID(À´×ÔÉÏÒ»¸öÊ±¿ÌµÄÊä³ö)
-        # Í¨¹ýembedding²ã±ä³É(1, 64, 500)£¬È»ºó½øÐÐdropout£¬shape²»±ä¡£
+        # ×¢ï¿½â£ºdecoderÃ¿Ò»ï¿½ï¿½Ö»ï¿½Ü´ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ê±ï¿½Ìµï¿½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½ÎªtÊ±ï¿½Ì¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë²ï¿½ï¿½Ü¼ï¿½ï¿½ï¿½t+1Ê±ï¿½Ì¡ï¿½
+        # input_stepï¿½ï¿½shapeï¿½ï¿½(1, 64)ï¿½ï¿½64ï¿½ï¿½batchï¿½ï¿½1ï¿½Çµï¿½Ç°ï¿½ï¿½ï¿½ï¿½Ä´ï¿½ID(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ê±ï¿½Ìµï¿½ï¿½ï¿½ï¿½)
+        # Í¨ï¿½ï¿½embeddingï¿½ï¿½ï¿½ï¿½(1, 64, 500)ï¿½ï¿½È»ï¿½ï¿½ï¿½ï¿½ï¿½dropoutï¿½ï¿½shapeï¿½ï¿½ï¿½ä¡£
         print(input_step.shape, "E")
         embedded = self.embedding(input_step)
         embedded = self.embedding_dropout(embedded)
-        # °Ñembedded´«ÈëGRU½øÐÐforward¼ÆËã
-        # µÃµ½rnn_outputµÄshapeÊÇ(1, 64, 500)
-        # hiddenÊÇ(2, 64, 500)£¬ÒòÎªÊÇÁ½²ãµÄGRU£¬ËùÒÔµÚÒ»Î¬ÊÇ2¡£
+        # ï¿½ï¿½embeddedï¿½ï¿½ï¿½ï¿½GRUï¿½ï¿½ï¿½ï¿½forwardï¿½ï¿½ï¿½ï¿½
+        # ï¿½Ãµï¿½rnn_outputï¿½ï¿½shapeï¿½ï¿½(1, 64, 500)
+        # hiddenï¿½ï¿½(2, 64, 500)ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½GRUï¿½ï¿½ï¿½ï¿½ï¿½Ôµï¿½Ò»Î¬ï¿½ï¿½2ï¿½ï¿½
         rnn_output, hidden = self.gru(embedded, last_hidden)
-        # ¼ÆËã×¢ÒâÁ¦È¨ÖØ£¬¸ù¾ÝÇ°ÃæµÄ·ÖÎö£¬attn_weightsµÄshapeÊÇ(64, 1, 10)
+        # ï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½ï¿½ï¿½È¨ï¿½Ø£ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½attn_weightsï¿½ï¿½shapeï¿½ï¿½(64, 1, 10)
         attn_weights = self.attn(rnn_output, encoder_outputs)
-        # encoder_outputsÊÇ(10, 64, 500)
-        # encoder_outputs.transpose(0, 1)ºóµÄshapeÊÇ(64, 10, 500)
-        # bmmÊÇÅúÁ¿µÄ¾ØÕó³Ë·¨£¬µÚÒ»Î¬ÊÇbatch£¬ÎÒÃÇ¿ÉÒÔ°Ñattn_weights¿´³É64¸ö(1,10)µÄ¾ØÕó
-        # °Ñencoder_outputs.transpose(0, 1)¿´³É64¸ö(10, 500)µÄ¾ØÕó
-        # ÄÇÃ´bmm¾ÍÊÇ64¸ö(1, 10)¾ØÕó x (10, 500)¾ØÕó£¬×îÖÕµÃµ½(64, 1, 500)
+        # encoder_outputsï¿½ï¿½(10, 64, 500)
+        # encoder_outputs.transpose(0, 1)ï¿½ï¿½ï¿½shapeï¿½ï¿½(64, 10, 500)
+        # bmmï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Î¬ï¿½ï¿½batchï¿½ï¿½ï¿½ï¿½ï¿½Ç¿ï¿½ï¿½Ô°ï¿½attn_weightsï¿½ï¿½ï¿½ï¿½64ï¿½ï¿½(1,10)ï¿½Ä¾ï¿½ï¿½ï¿½
+        # ï¿½ï¿½encoder_outputs.transpose(0, 1)ï¿½ï¿½ï¿½ï¿½64ï¿½ï¿½(10, 500)ï¿½Ä¾ï¿½ï¿½ï¿½
+        # ï¿½ï¿½Ã´bmmï¿½ï¿½ï¿½ï¿½64ï¿½ï¿½(1, 10)ï¿½ï¿½ï¿½ï¿½ x (10, 500)ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÕµÃµï¿½(64, 1, 500)
         context = attn_weights.bmm(encoder_outputs.transpose(0, 1))
-        # °ÑcontextÏòÁ¿ºÍGRUµÄÊä³öÆ´½ÓÆðÀ´
-        # rnn_output´Ó(1, 64, 500)±ä³É(64, 500)
+        # ï¿½ï¿½contextï¿½ï¿½ï¿½ï¿½ï¿½ï¿½GRUï¿½ï¿½ï¿½ï¿½ï¿½Æ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        # rnn_outputï¿½ï¿½(1, 64, 500)ï¿½ï¿½ï¿½(64, 500)
         rnn_output = rnn_output.squeeze(0)
-        # context´Ó(64, 1, 500)±ä³É(64, 500)
+        # contextï¿½ï¿½(64, 1, 500)ï¿½ï¿½ï¿½(64, 500)
         context = context.squeeze(1)
-        # Æ´½ÓµÃµ½(64, 1000)
+        # Æ´ï¿½ÓµÃµï¿½(64, 1000)
         concat_input = torch.cat((rnn_output, context), 1)
-        # self.concatÊÇÒ»¸ö¾ØÕó(1000, 500)£¬
-        # self.concat(concat_input)µÄÊä³öÊÇ(64, 500)
-        # È»ºóÓÃtanh°ÑÊä³ö·µ»Ø±ä³É(-1,1)£¬concat_outputµÄshapeÊÇ(64, 500)
+        # self.concatï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(1000, 500)ï¿½ï¿½
+        # self.concat(concat_input)ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(64, 500)
+        # È»ï¿½ï¿½ï¿½ï¿½tanhï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø±ï¿½ï¿½(-1,1)ï¿½ï¿½concat_outputï¿½ï¿½shapeï¿½ï¿½(64, 500)
         concat_output = torch.tanh(self.concat(concat_input))
-        # outÊÇ(batch_size, ´Êµä´óÐ¡voc.num_words)
+        # outï¿½ï¿½(batch_size, ï¿½Êµï¿½ï¿½Ð¡voc.num_words)
         output = self.out(concat_output)
         output = F.softmax(output, dim=1)
         # Return output and final hidden state

@@ -13,13 +13,29 @@ from transtensor import *
 
 """
 数据的预处理
+
+使用前请确保句对用'\t'分隔，根据句子是否分词调整need_jieba，需要分词为True
+
 调用Datapreprocess，获取pairs和voc
+Datapreprocess只用于单个文件的处理
+
+批处理文件需要使用FileDatapreprocess
+一次批处理产生一个voc和pairs的pkl文件，同时存储分好词的文件，如果不需存储请注释相应
+的语句
+
 使用pairs可以创建batch，通过Batch2Tensor可以获取向量
 和官方示例的功能一样
 """
+file_list = [
+    'raw_data/qingyun.tsv',
+    'raw_data/chatterbot.tsv',
+    'raw_data/xiaohuangji.tsv',
+    'raw_data/ptt.tsv',
+    'raw_data/douban_single_turn.tsv'
+]
 
 # 句子是否已分词
-need_jieba = False
+need_jieba = True
 # 保存加载词典开关
 save_voc = False
 load_voc = False
@@ -78,10 +94,11 @@ def LoadVoc(voc, load_path):
             word_dict[line[0]] = int(line[1])
     voc.InitializeVoc(word_dict)
 
-# 数据预处理
-def DataPreprocess(file_name, voc_file = ""):
+# 对单个文件的数据预处理
+def DataPreprocess(file_name, voc = None, voc_file = ""):
     print("\nData preprocessing ... ")
-    voc = Vocabulary("zh-voc")
+    if voc is None:
+        voc = Vocabulary("zh-voc")
     # 如果需要，加载词典
     # if load_voc:
     #     LoadVoc(voc, voc_file)
@@ -113,14 +130,52 @@ def DataPreprocess(file_name, voc_file = ""):
     #     SaveVoc(voc, voc_file)
     return voc, filtered_pairs
 
+# 对多个文件的数据预处理
+def FileDataPreprocess(file_list):
+    print("\nFliles Data preprocessing ... ")
+    voc = Vocabulary("file_zh-voc")
+    clean_pairs = []
+    for file in file_list:
+        total_pairs = []
+        with open(file, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            for line in lines:
+                pair = line.strip('\n').split(split_char)
+                clean_pair = []
+
+                for sentence in pair:
+                    # 对pair中的句子正则化
+                    sentence = NormalizeSentence(sentence)
+                    clean_pair.append(sentence)
+                # 不用过滤直接保存这个pair供以后使用
+                total_pairs.append(clean_pair)
+
+                # 如果句子长度超过50直接过滤掉这个pair
+                if filterPair(clean_pair):
+                    # 将pair中的词加入词典
+                    AddWord2Voc(voc, clean_pair)
+                    clean_pairs.append(clean_pair)
+            
+            OutputFile(total_pairs, file + "_jieba.txt")
+            total_pairs.clear()
+
+    # abandon the words with count less than 5
+    voc.Trim(5)  
+    # 如果pair中的词不再词典里直接过滤
+    filtered_pairs = [pair for pair in clean_pairs if IsVocWordInPair(voc, pair)]
+    # 存储 voc
+    # if save_voc:
+    #     SaveVoc(voc, voc_file)
+    return voc, filtered_pairs
+
 
 # 保存转化好的句子对，句子对用\t分隔
 def OutputFile(pairs, file_name):
     with open(file_name, 'w', encoding='utf-8') as f:
         for pair in pairs:
-            f.write(whitespace.join(pair[0]))
+            f.write(' '.join(pair[0]))
             f.write('\t')
-            f.write(whitespace.join(pair[1]))
+            f.write(' '.join(pair[1]))
             f.write('\n')
 
 
@@ -148,26 +203,26 @@ def TestBatchTrans(pairs, file_name = ''):
 
 
 if __name__ == "__main__":
-    raw_name = 'qingyun_processed'
-    raw_file_name = 'raw_data/' + raw_name + '.txt'
+    # raw_name = 'qingyun_processed'
+    # raw_file_name = 'raw_data/' + raw_name + '.txt'
 
     # processed_file_name = 'raw_data/' + raw_name + '_p.txt'
     # voc_file_name = 'raw_data/' + raw_name + '_voc.txt'
     # batch_file_name = 'raw_data/' + raw_name + '_batch.txt'
     
     # 数据预处理
-    voc, pairs = DataPreprocess(raw_file_name)
+    voc, pairs = FileDataPreprocess(file_list)
 
     whitespace = ' '
     print("\nThe dictionary has {} words.".format(voc.words_num))
     print("\n{} pairs selected.".format(len(pairs)))    
     
     # 保存voc和pairs
-    with open('data/voc.pkl','wb') as f:
+    with open('data/files_voc.pkl','wb') as f:
         pickle.dump(voc, f)
     print('voc saved')
 
-    with open('data/pairs.pkl','wb') as f:
+    with open('data/files_pairs.pkl','wb') as f:
         pickle.dump(pairs, f)
     print('pairs saved')
 

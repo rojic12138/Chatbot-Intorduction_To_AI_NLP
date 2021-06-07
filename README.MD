@@ -14,6 +14,7 @@ ___
   - 预处理前后的文本文件位于`raw_data`目录下
     - 后缀`.tsv`的文本文件为经过以第一轮清洗未分词的文件
     - 后缀`jieba.txt`的文本文件未经过第二轮分词后的文件
+  - 使用：在`datapreprocess.py`中更改`files`以决定需要处理哪些文件，记得同时修改`main`函数中的`voc`和`pairs`的存储路径 
   - 预处理后的词典和句对文件位于`data`目录下
     - 后缀`voc.pkl`为词典文件，后缀`pairs.pkl`为句对文件，加载模型需要这两个文件，在`config.py`中修改对应路径
     - `voc.pkl`、`pairs.pkl`只包含了qingyun语料
@@ -27,3 +28,5 @@ ___
       'raw_data/douban_single_turn.tsv'
       ]
       ```
+  - 预处理词向量，运行`pre_embed.py`文件，在fasttext中的词直接采用词向量，不在的词随机生成词向量，**embedding_dim指定为300**
+    - 如果使用第一个模型，请将`hidden_size`与`embedding_dim`设置为一样，也可以修改`model.py`中对应部分，把需要改成embedding_dim的地方改一下

@@ -28,12 +28,9 @@ Datapreprocess只用于单个文件的处理
 使用pairs可以创建batch，通过Batch2Tensor可以获取向量
 和官方示例的功能一样
 """
+
 file_list = [
-    'raw_data/qingyun.tsv',
-    'raw_data/chatterbot.tsv',
-    'raw_data/xiaohuangji.tsv',
-    'raw_data/ptt.tsv',
-    'raw_data/douban_single_turn.tsv'
+    'raw_data/xiaohuangji.tsv_jieba.txt',
 ]
 
 # 句子是否已分词
@@ -138,6 +135,9 @@ def FileDataPreprocess(file_list):
     voc = Vocabulary("file_zh-voc")
     clean_pairs = []
     for file in file_list:
+        # 带有jieba后缀不用再分词了
+        if 'jieba' in file:
+            need_jieba = False
         total_pairs = []
         with open(file, 'r', encoding='utf-8') as f:
             lines = f.readlines()
@@ -158,7 +158,9 @@ def FileDataPreprocess(file_list):
                     AddWord2Voc(voc, clean_pair)
                     clean_pairs.append(clean_pair)
             
-            OutputFile(total_pairs, file + "_jieba.txt")
+            if need_jieba:
+                # 需要分词才重新存储
+                OutputFile(total_pairs, file + "_jieba.txt")
             total_pairs.clear()
 
     # abandon the words with count less than 5
@@ -220,11 +222,11 @@ if __name__ == "__main__":
     print("\n{} pairs selected.".format(len(pairs)))    
     
     # 保存voc和pairs
-    with open('data/files_voc.pkl','wb') as f:
+    with open('data/xiaohuangji_voc.pkl','wb') as f:
         pickle.dump(voc, f)
     print('voc saved')
 
-    with open('data/files_pairs.pkl','wb') as f:
+    with open('data/xiaohuangji_pairs.pkl','wb') as f:
         pickle.dump(pairs, f)
     print('pairs saved')
 

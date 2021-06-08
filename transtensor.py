@@ -16,7 +16,14 @@ from define import *
 
 # transfer a sentence to a list of word indexes
 def IndexesFromSentence(voc, sentence):
-    return [voc.word2index[word] for word in sentence] + [EOS_index]
+    res = []
+    for word in sentence:
+        if word in voc.word2index.keys():
+            res.append(voc.word2index[word])
+        else:
+            res.append(UKN_index)
+    res.append(EOS_index)
+    return res
 
 
 # fill then sentence with PAD_token to match the longest length

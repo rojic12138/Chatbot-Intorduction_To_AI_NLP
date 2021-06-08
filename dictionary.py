@@ -13,10 +13,10 @@ class Vocabulary:
     def __init__(self, name):
         self.name = name
         self.trimmed = False
-        self.word2index = {"<PAD>": PAD_index, "<SOS>": SOS_index, "<EOS>": EOS_index}
-        self.index2word = {PAD_index: "<PAD>", SOS_index: "<SOS>", EOS_index: "<EOS>"}
+        self.word2index = {"<PAD>": PAD_index, "<SOS>": SOS_index, "<EOS>": EOS_index, "<UKN>": UKN_index}
+        self.index2word = {PAD_index: "<PAD>", SOS_index: "<SOS>", EOS_index: "<EOS>", UKN_index: "<UKN>"}
         self.word2count = {}
-        self.words_num = 3  # pad, sos, eos
+        self.words_num = 4  # pad, sos, eos
     
     def InitializeVoc(self, word_dict):
         # 初始化词典
@@ -46,10 +46,10 @@ class Vocabulary:
 
         word_list = [word for word, cnt in self.word2count.items() if cnt >= min_cnt]
 
-        self.word2index = {"<PAD>": PAD_index, "<SOS>": SOS_index, "<EOS>": EOS_index}
-        self.index2word = {PAD_index: "<PAD>", SOS_index: "<SOS>", EOS_index: "<EOS>"}
+        self.word2index = {"<PAD>": PAD_index, "<SOS>": SOS_index, "<EOS>": EOS_index, "<UKN>": UKN_index}
+        self.index2word = {PAD_index: "<PAD>", SOS_index: "<SOS>", EOS_index: "<EOS>", UKN_index: "<UKN>"}
         self.word2count = {}
-        self.words_num = 3  # pad, sos, eos
+        self.words_num = 4  # pad, sos, eos
         # rebuild the voc
         for word in word_list:
             self.AddWord(word)

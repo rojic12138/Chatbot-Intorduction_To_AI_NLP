@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 import torch
 
 class Config:
@@ -18,8 +16,9 @@ class Config:
     '''
     训练超参数
     '''
-    batch_size = 20
-    shuffle = True                                #是否打乱数据
+    batch_size = 32
+    shuffle = True                                #dataloader是否打乱数据
+    num_workers = 0                               #dataloader多进程提取数据
     bidirectional = True                          #Encoder-RNN是否双向
     hidden_size = 240
     embedding_dim = 256
@@ -28,13 +27,13 @@ class Config:
     clip = 50.0                                   #梯度裁剪阈值
     encoder_n_layers = 2                          #Encoder-RNN层数
     decoder_n_layers = 2                          #decoder层数                              
-    learning_rate = 1e-3
+    learning_rate = 1e-5
     teacher_forcing_ratio = 1.0                   #teacher_forcing比例
     decoder_learning_ratio = 5.0
     '''
     训练周期信息
     '''
-    n_iteration = 1000                            # 训练次数
+    n_iteration = 100000                            # 训练次数
     print_every = 10
     save_every = 500                              # 存储训练的数据
     '''

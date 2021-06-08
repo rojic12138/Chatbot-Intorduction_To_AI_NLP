@@ -7,7 +7,6 @@ import re
 import logging
 
 from numpy import empty, save
-# from zh_tool.langconv import Converter
 from dictionary import Vocabulary
 import random
 from define import *
@@ -28,7 +27,8 @@ Datapreprocess只用于单个文件的处理
 使用pairs可以创建batch，通过Batch2Tensor可以获取向量
 和官方示例的功能一样
 """
-
+voc_save_path = 'data/xiaohuangji_voc.pkl'
+pairs_save_path = 'data/xiaohuangji_pairs.pkl'
 file_list = [
     'raw_data/xiaohuangji.tsv_jieba.txt',
 ]
@@ -138,6 +138,8 @@ def FileDataPreprocess(file_list):
         # 带有jieba后缀不用再分词了
         if 'jieba' in file:
             need_jieba = False
+        else:
+            need_jieba = True
         total_pairs = []
         with open(file, 'r', encoding='utf-8') as f:
             lines = f.readlines()
@@ -191,28 +193,9 @@ def TestBatchTrans(pairs, file_name = ''):
     
     # 大概是核心功能
     batches = Batch2Tensor(test_batch, voc)
-    input_tensor, output_tensor, lengths, max_output_len, mask= batches
     
-    # 看看效果
-    # with open(file_name, 'w', encoding='utf-8') as f:
-    #     f.write("input_tensor:{}".format(input_tensor))
-    #     f.write('\n')
-    #     f.write("length:{}".format(lengths))
-    #     f.write('\n')
-    #     f.write("output_tensor:{}".format(output_tensor))
-    #     f.write('\n')
-    #     f.write("mask:{}".format(mask))
-    #     f.write('\n')
-    #     f.write("max_outpus_len:{}".format(max_output_len))
-
 
 if __name__ == "__main__":
-    # raw_name = 'qingyun_processed'
-    # raw_file_name = 'raw_data/' + raw_name + '.txt'
-
-    # processed_file_name = 'raw_data/' + raw_name + '_p.txt'
-    # voc_file_name = 'raw_data/' + raw_name + '_voc.txt'
-    # batch_file_name = 'raw_data/' + raw_name + '_batch.txt'
     
     # 数据预处理
     voc, pairs = FileDataPreprocess(file_list)
@@ -222,17 +205,13 @@ if __name__ == "__main__":
     print("\n{} pairs selected.".format(len(pairs)))    
     
     # 保存voc和pairs
-    with open('data/xiaohuangji_voc.pkl','wb') as f:
+    with open(voc_save_path,'wb') as f:
         pickle.dump(voc, f)
     print('voc saved')
 
-    with open('data/xiaohuangji_pairs.pkl','wb') as f:
+    with open(pairs_save_path,'wb') as f:
         pickle.dump(pairs, f)
     print('pairs saved')
-
- 
-    # 输出pairs
-    # OutputFile(pairs, processed_file_name)
 
     # 测试batch转换
     TestBatchTrans(pairs)

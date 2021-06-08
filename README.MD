@@ -11,6 +11,7 @@ ___
 ___
 ### 组织
 - 预处理文件  
+  [raw data](https://disk.pku.edu.cn:443/link/67966F87BBA6EDD2CDAEEB28F77040EB)
   - 预处理前后的文本文件位于`raw_data`目录下
     - 后缀`.tsv`的文本文件为经过以第一轮清洗未分词的文件
     - 后缀`jieba.txt`的文本文件为经过第二轮分词后的文件
@@ -29,4 +30,4 @@ ___
       ]
       ```
   - 预处理词向量，运行`pre_embed.py`文件，在fasttext中的词直接采用词向量，不在的词随机生成词向量，**embedding_dim指定为300**
-    - 如果使用第一个模型，请将`hidden_size`与`embedding_dim`设置为一样，也可以修改`model.py`中对应部分，把需要改成embedding_dim的地方改一下
+    - 必要时，请将`hidden_size`与`embedding_dim`设置为一样

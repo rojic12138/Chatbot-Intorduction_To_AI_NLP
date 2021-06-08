@@ -1,22 +1,23 @@
-import torch
-from torch.jit import script, trace
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import torch
+from torch.jit import script, trace
 import torch.nn as nn
 from torch import optim
 import torch.nn.functional as F
 from model2 import *
 class EncoderRNN(nn.Module):
-    def __init__(self, hidden_size, embedding, n_layers=1, dropout=0):
+    def __init__(self, hidden_size, embedding_size, embedding, n_layers=1, dropout=0):
         super(EncoderRNN, self).__init__()
         self.n_layers = n_layers
         self.hidden_size = hidden_size
+        self.embedding_size = embedding_size
         self.embedding = embedding
 
         # Initialize GRU; the input_size and hidden_size params are both set to 'hidden_size'
         #   because our input size is a word embedding with number of features == hidden_size
         # 如果只有一层，那么不进行Dropout，否则使用传入的参数dropout进行GRU的Dropout。
-        self.gru = nn.GRU(hidden_size, hidden_size, n_layers,
+        self.gru = nn.GRU(embedding_size, hidden_size, n_layers,
                           dropout=(0 if n_layers == 1 else dropout), bidirectional=True)
 
     def forward(self, input_seq, input_lengths, hidden=None):
@@ -88,12 +89,13 @@ class Attn(torch.nn.Module):
 
 
 class LuongAttnDecoderRNN(nn.Module):
-    def __init__(self, attn_model, embedding, hidden_size, output_size, n_layers=1, dropout=0.1):
+    def __init__(self, attn_model, embedding, hidden_size, embedding_size, output_size, n_layers=1, dropout=0.1):
         super(LuongAttnDecoderRNN, self).__init__()
 
         # Keep for reference
         self.attn_model = attn_model
         self.hidden_size = hidden_size
+        self.embedding_size = embedding_size
         self.output_size = output_size
         self.n_layers = n_layers
         self.dropout = dropout
@@ -101,7 +103,7 @@ class LuongAttnDecoderRNN(nn.Module):
         # Define layers
         self.embedding = embedding
         self.embedding_dropout = nn.Dropout(dropout)
-        self.gru = nn.GRU(hidden_size, hidden_size, n_layers, dropout=(0 if n_layers == 1 else dropout))
+        self.gru = nn.GRU(embedding_size, hidden_size, n_layers, dropout=(0 if n_layers == 1 else dropout))
         self.concat = nn.Linear(hidden_size * 2, hidden_size)
         self.out = nn.Linear(hidden_size, output_size)
 

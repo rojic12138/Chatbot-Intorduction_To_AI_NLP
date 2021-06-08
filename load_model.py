@@ -32,7 +32,7 @@ def initGenModel(opt):
     
     # 初始化词向量
     print('Initialize word embeddings')
-    embedding = nn.Embedding(voc.words_num, opt.hidden_size)
+    embedding = nn.Embedding(voc.words_num, opt.embedding_dim)
 
     # 载入预训练的词向量
     if opt.load_file:
@@ -45,10 +45,10 @@ def initGenModel(opt):
 
     # 初始化模型
     print('Initilize model')
-    #encoder = EncoderRNN(opt.hidden_size, embedding, opt.encoder_n_layers, opt.dropout)
-    encoder = EncoderTransformer(opt.hidden_size, embedding, opt.encoder_n_layers, opt.dropout)
-    #decoder = LuongAttnDecoderRNN(opt.attn_method, embedding, opt.hidden_size, voc.words_num, opt.decoder_n_layers, opt.dropout)
-    decoder = DecoderTransformer(embedding, opt.hidden_size, voc.words_num, opt.device, opt.decoder_n_layers, opt.dropout, heads = 4)
+    encoder = EncoderRNN(opt.hidden_size, opt.embedding_dim, embedding, opt.encoder_n_layers, opt.dropout)
+    # encoder = EncoderTransformer(opt.hidden_size, embedding, opt.encoder_n_layers, opt.dropout)
+    decoder = LuongAttnDecoderRNN(opt.attn_method, embedding, opt.hidden_size, opt.embedding_dim, voc.words_num, opt.decoder_n_layers, opt.dropout)
+    # decoder = DecoderTransformer(embedding, opt.hidden_size, voc.words_num, opt.device, opt.decoder_n_layers, opt.dropout, heads = 4)
     if opt.load_file:
         encoder.load_state_dict(encoder_sd)
         decoder.load_state_dict(decoder_sd)

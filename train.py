@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#Written by LH 
 import random
 import torch
 import os
@@ -11,17 +10,14 @@ from transtensor import *
 from dictionary import *
 from model import *
 '''
-训练分为八步：
+训练分为七步：
 1) 把整个batch的输入传入encoder 
-2) 把decoder的输入设置为特殊的，初始隐状态设置为encoder最后时刻的隐状态 
-3) decoder每次处理一个时刻的forward计算 
-4) 如果是teacher forcing，把上个时刻的"正确的"词作为当前输入，否则用上一个时刻的输出作为当前时刻的输入 
-5) 计算loss 
-6) 反向计算梯度 
-7) 对梯度进行裁剪 
-8) 更新模型(包括encoder和decoder)参数
-
-问题：teacher forcing用到的"当前正确答案"哪里来的
+2) decoder每次处理一个时刻的forward计算 
+3) 如果是teacher forcing，把上个时刻的"正确的"词作为当前输入，否则用上一个时刻的输出作为当前时刻的输入 
+4) 计算loss 
+5) 反向计算梯度 
+6) 对梯度进行裁剪 
+7) 更新模型(包括encoder和decoder)参数
 '''
 
 def train(opt, 

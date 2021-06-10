@@ -36,4 +36,4 @@ for k in voc.index2word.keys():
         voc_emb[k] = np.random.normal(scale=0.6, size=(embedding_dim, ))
 
 # TODO 不使用随机而是计算未知词的均值
-pickle.dump(voc_emb, open(f'data/embedding.pkl', 'wb'))
+pickle.dump(voc_emb, open(f'data/xiaohuangji_embedding.pkl', 'wb'))

@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#Written by LH 
 from torch._C import device
 from datapreprocess import *
 import torch
@@ -94,11 +93,13 @@ def evaluate(opt, encoder, decoder, searcher, voc, sentence, max_length=MAX_SENT
 evaluateInput是chatbot的用户接口
 过程：
 1)输入一个句子
-2)用evaluate生成回 去
-3)掉EOS之后的内容
+2)用evaluate生成回 
+3)去掉EOS之后的内容
 4)重复对话，直到输入q/quit
 '''
-    
+
+#建一个字典
+dictionary={'苟利国家生死以':'岂因祸福避趋之','北京大学':'清华大学','清华大学':'北京大学'}
 def evaluateInput(opt, encoder, decoder, searcher, voc):
     input_sentence = ''
     while(1):
@@ -106,6 +107,9 @@ def evaluateInput(opt, encoder, decoder, searcher, voc):
             input_sentence = input('请输入> ')
             #输入q/quit，结束程序
             if input_sentence == 'q' or input_sentence == 'quit': break
+            if(input_sentence in dictionary):
+                print('尬聊Bot:',dictionary[input_sentence])
+                continue
             #句子归一化
             input_sentence = NormalizeSentence(input_sentence, True)
             #生成答句
@@ -121,7 +125,6 @@ def evaluateInput(opt, encoder, decoder, searcher, voc):
         #错误处理
         except KeyError:
             print("Error: Encountered unknown word.")
-    
     
     
     

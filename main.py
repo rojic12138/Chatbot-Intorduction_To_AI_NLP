@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 import os
 from traitlets import config
 from config import Config
@@ -24,4 +22,4 @@ def Chat():
 
 
 if __name__ == '__main__':
-    Chat()
+   Chat()

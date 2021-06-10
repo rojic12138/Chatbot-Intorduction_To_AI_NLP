@@ -1,5 +1,3 @@
-#!/usr/bin/python3.9 
-# -*- coding: utf-8 -*- 
 from train import trainIters
 from config import Config
 from evaluate import *
@@ -46,7 +44,7 @@ def Train():
         decoder_optimizer.load_state_dict(decoder_optimizer_sd)
 
     # 开始训练
-    print("Trainging")
+    print("Training")
     save_dir = os.path.join("data", "save")
 
     trainIters(opt, 

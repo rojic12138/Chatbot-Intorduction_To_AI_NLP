@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 import torch
 
 class Config:
@@ -10,8 +8,8 @@ class Config:
     corpus_name = 'qingyun'                       # 数据来源
     voc_file = 'data/voc.pkl'                     # 词典文件
     pairs_file = 'data/pairs.pkl'                 # 对话数据文件
-    load_file = None                              # 加载文件
-    embedding_file = None         # 词向量文件，暂时没有
+    load_file = None
+    embedding_file = 'data/embedding.pkl'         # 词向量文件，暂时没有
     max_input_length = 50                         #输入的最大句子长度
     max_generate_length = 20                      #生成的最大句子长度
 
@@ -19,9 +17,10 @@ class Config:
     训练超参数
     '''
     batch_size = 32
-    shuffle = True                                #是否打乱数据
+    shuffle = True                                #dataloader是否打乱数据
+    num_workers = 0                               #dataloader多进程提取数据
     bidirectional = True                          #Encoder-RNN是否双向
-    hidden_size = 256
+    hidden_size = 240
     embedding_dim = 300
     attn_method = 'dot'                           #attention method
     dropout = 0                                   #是否使用dropout
@@ -34,11 +33,12 @@ class Config:
     '''
     训练周期信息
     '''
-    n_iteration = 10000                            # 训练次数
-    print_every = 10
+    n_iteration = 10000                           # 训练次数
+    print_every = 1
     save_every = 500                              # 存储训练的数据
     '''
     GPU
     '''
     use_gpu = torch.cuda.is_available() #是否使用gpu
     device = torch.device("cuda" if use_gpu else "cpu") #device
+    load_file = 'data/save/mole/qingyun/2-2_240/19000_checkpoint.tar'

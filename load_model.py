@@ -5,7 +5,7 @@ import numpy as np
 from config import Config
 from transtensor import *
 from dictionary import *
-from model2 import *
+from model import *
 
 
 def initGenModel(opt):

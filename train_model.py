@@ -23,8 +23,8 @@ def Train():
 
     # 初始化 optimizer
     print('Building optimizers')
-    encoder_optimizer = optim.Adam(encoder.parameters(), lr=opt.learning_rate)
-    decoder_optimizer = optim.Adam(decoder.parameters(), lr=opt.learning_rate * opt.decoder_learning_ratio)
+    encoder_optimizer = torch.optim.Adam(encoder.parameters(), lr=opt.learning_rate)
+    decoder_optimizer = torch.optim.Adam(decoder.parameters(), lr=opt.learning_rate * opt.decoder_learning_ratio)
 
     for state in encoder_optimizer.state.values():
         for k, v in state.items():
